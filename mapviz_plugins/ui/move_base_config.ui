@@ -45,7 +45,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Abort [2D Nav Goal] execution&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Abort</string>
+        <string> Abort</string>
        </property>
        <property name="icon">
         <iconset resource="../../mapviz/src/resources/icons.qrc">
@@ -76,7 +76,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Publish robot pose on topic [/initialpose]&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Estimated Pose</string>
+        <string> Estimated Pose</string>
        </property>
        <property name="icon">
         <iconset resource="../../mapviz/src/resources/icons.qrc">
@@ -110,7 +110,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Send a goal to [move_base] action server&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>2D Nav Goal</string>
+        <string> 2D Nav Goal</string>
        </property>
        <property name="icon">
         <iconset resource="../../mapviz/src/resources/icons.qrc">
