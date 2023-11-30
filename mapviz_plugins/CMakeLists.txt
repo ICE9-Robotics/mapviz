@@ -26,6 +26,7 @@ set(DEPENDENCIES
   swri_yaml_util
   tf 
   visualization_msgs
+  rtkgps_odom_matcher
 )
 
 find_package(catkin REQUIRED COMPONENTS ${DEPENDENCIES})
@@ -107,6 +108,7 @@ set(UI_FILES
     ui/tf_frame_config.ui
     ui/topic_select.ui
     ui/draw_waypoints_config.ui
+    ui/matcher_config.ui
 )
 
 set(SRC_FILES
@@ -144,6 +146,7 @@ set(SRC_FILES
     src/textured_marker_plugin.cpp
     src/tf_frame_plugin.cpp
     src/draw_waypoints_plugin.cpp
+    src/matcher_plugin.cpp
 )
 
 set(HEADER_FILES
@@ -182,6 +185,7 @@ set(HEADER_FILES
     include/${PROJECT_NAME}/textured_marker_plugin.h
     include/${PROJECT_NAME}/tf_frame_plugin.h
     include/${PROJECT_NAME}/draw_waypoints_plugin.h
+    include/${PROJECT_NAME}/matcher_plugin.h
 )
 
 qt5_wrap_ui(UI_SRC_FILES ${UI_FILES})

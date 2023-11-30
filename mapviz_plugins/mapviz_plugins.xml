@@ -97,5 +97,8 @@
   <class name="mapviz_plugins/object" type="mapviz_plugins::ObjectPlugin" base_class_type="mapviz::MapvizPlugin">
     <description>Display marti_nav_msgs::Obstacles and TrackedObjects</description>
   </class>
+  <class name="mapviz_plugins/matcher" type="mapviz_plugins::MatcherPlugin" base_class_type="mapviz::MapvizPlugin">
+      <description>UI for matcher node.</description>
+  </class>
 </library>
 
