@@ -100,5 +100,8 @@
   <class name="mapviz_plugins/matcher" type="mapviz_plugins::MatcherPlugin" base_class_type="mapviz::MapvizPlugin">
       <description>UI for matcher node.</description>
   </class>
+  <class name="mapviz_plugins/ugi_diagnostics" type="mapviz_plugins::UgiDiagnosticsPlugin" base_class_type="mapviz::MapvizPlugin">
+      <description>Displays UGI diagnostics info.</description>
+  </class>
 </library>
 

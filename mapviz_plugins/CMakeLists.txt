@@ -27,6 +27,7 @@ set(DEPENDENCIES
   tf 
   visualization_msgs
   rtkgps_odom_matcher
+  unitree_diagnostics_msgs
 )
 
 find_package(catkin REQUIRED COMPONENTS ${DEPENDENCIES})
@@ -109,6 +110,7 @@ set(UI_FILES
     ui/topic_select.ui
     ui/draw_waypoints_config.ui
     ui/matcher_config.ui
+    ui/ugi_diagnostics_config.ui
 )
 
 set(SRC_FILES
@@ -147,6 +149,7 @@ set(SRC_FILES
     src/tf_frame_plugin.cpp
     src/draw_waypoints_plugin.cpp
     src/matcher_plugin.cpp
+    src/ugi_diagnostics_plugin.cpp
 )
 
 set(HEADER_FILES
@@ -186,6 +189,7 @@ set(HEADER_FILES
     include/${PROJECT_NAME}/tf_frame_plugin.h
     include/${PROJECT_NAME}/draw_waypoints_plugin.h
     include/${PROJECT_NAME}/matcher_plugin.h
+    include/${PROJECT_NAME}/ugi_diagnostics_plugin.h
 )
 
 qt5_wrap_ui(UI_SRC_FILES ${UI_FILES})
