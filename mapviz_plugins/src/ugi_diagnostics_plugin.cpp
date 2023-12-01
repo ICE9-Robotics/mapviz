@@ -30,6 +30,7 @@
 
 #include <mapviz_plugins/ugi_diagnostics_plugin.h>
 #include <sstream>
+#include <iostream>
 
 #include <pluginlib/class_list_macros.h>
 #include <mapviz/select_topic_dialog.h>
@@ -84,8 +85,7 @@ namespace mapviz_plugins
 
     ui_.color->setColor(color_);
 
-    messageStream_.precision(3);
-
+    messageStream_.setf(std::ios_base::fixed, std::ios_base::floatfield);
 
     timer_ = node_.createTimer(10, &UgiDiagnosticsPlugin::periodUpdate, this, false, false);
   }
@@ -402,6 +402,7 @@ namespace mapviz_plugins
 
   void UgiDiagnosticsPlugin::diagnosticsCallback(const unitree_diagnostics_msgs::Diagnostics::ConstPtr& msg)
   {
+    diagnoInfo_.timestamp = msg->header.stamp;
     diagnoInfo_.batterySoC = msg->batterySoC;
     diagnoInfo_.commandVelocity = msg->commandVelocity;
     diagnoInfo_.commandYawSpeed = msg->commandYawSpeed;
@@ -418,19 +419,34 @@ namespace mapviz_plugins
 
   void UgiDiagnosticsPlugin::periodUpdate(const ros::TimerEvent& event)
   {
-    double now = ros::Time::now().toSec();
+    ros::Time now = ros::Time::now();
     messageStream_.str("");
     messageStream_.clear();
+    messageStream_.precision(1);
 
-    double highStateTime = now - diagnoInfo_.highStateTs;
-    if (highStateTime > 999)
+    double diagTime = (now - diagnoInfo_.timestamp).toSec();
+    if (diagTime > 999)
     {
-      messageStream_<< "> <b>Robot status</b> (out-of-date)<br>";
+      messageStream_ << "> <b>Diagnostics</b> (out-of-date)<br>";
     }
     else
     {
-      messageStream_ << "> <b>Robot</b> status (" << highStateTime << "s ago)<br>";
+      messageStream_ << "> <b>Diagnostics</b> (" << diagTime << "s ago)<br>";
     }
+    
+    messageStream_ << "--------------------------" << "<br>";
+
+    double highStateTime = (now - diagnoInfo_.highStateTs).toSec();
+    if (highStateTime > 999)
+    {
+      messageStream_ << "> <b>Robot status</b> (out-of-date)<br>";
+    }
+    else
+    {
+      messageStream_ << "> <b>Robot status</b> (" << highStateTime << "s ago)<br>";
+    }
+
+    messageStream_.precision(3);
     messageStream_ << std::noskipws
                   << "<b>Battery  : </b>" << diagnoInfo_.batterySoC << "%<br>"
                   << "<b>Velocity : </b>" << diagnoInfo_.velocity << " m/s<br>"
@@ -441,7 +457,8 @@ namespace mapviz_plugins
                   << "<b>Yaw speed: </b>" << diagnoInfo_.commandYawSpeed << " rad/s<br>"
                   << "<br>";
     
-    double gpsTime = now - diagnoInfo_.gpsStatusTs;
+    messageStream_.precision(1);
+    double gpsTime = (now - diagnoInfo_.gpsStatusTs).toSec();
     if (gpsTime > 999)
     {
       messageStream_ << "> <b>GPS status</b> (out-of-date)<br>";
