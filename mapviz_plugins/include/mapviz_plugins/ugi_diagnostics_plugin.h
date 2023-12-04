@@ -57,13 +57,14 @@ namespace mapviz_plugins
 {
   struct DiagnosticsInfo
   {
-    double highStateTs;
+    ros::Time timestamp;
+    ros::Time highStateTs;
+    ros::Time gpsStatusTs;
     int batterySoC;
     double velocity;
     double yawSpeed;
     double commandVelocity;
     double commandYawSpeed;
-    double gpsStatusTs;
     std::string gpsStatusDescription;
   };
 

@@ -449,12 +449,12 @@ namespace mapviz_plugins
     messageStream_.precision(3);
     messageStream_ << std::noskipws
                   << "<b>Battery  : </b>" << diagnoInfo_.batterySoC << "%<br>"
-                  << "<b>Velocity : </b>" << diagnoInfo_.velocity << " m/s<br>"
-                  << "<b>Yaw speed: </b>" << diagnoInfo_.yawSpeed << " rad/s<br>"
+                  << "<b>Velocity : </b>" << diagnoInfo_.velocity*1000 << " mm/s<br>"
+                  << "<b>Yaw speed: </b>" << diagnoInfo_.yawSpeed*180/3.14159 << " deg/s<br>"
                   << "<br>"
                   << "> <b>Command status</b><br>"
-                  << "<b>Velocity : </b>" << diagnoInfo_.commandVelocity << " m/s<br>"
-                  << "<b>Yaw speed: </b>" << diagnoInfo_.commandYawSpeed << " rad/s<br>"
+                  << "<b>Velocity : </b>" << diagnoInfo_.commandVelocity*1000 << " mm/s<br>"
+                  << "<b>Yaw speed: </b>" << diagnoInfo_.commandYawSpeed*180/3.14159 << " deg/s<br>"
                   << "<br>";
     
     messageStream_.precision(1);
