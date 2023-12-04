@@ -46,6 +46,7 @@
 #include <geometry_msgs/Point32.h>
 #include <geometry_msgs/PolygonStamped.h>
 #include <ros/master.h>
+#include <std_srvs/Trigger.h>
 #include <mapviz/select_frame_dialog.h>
 #include <swri_transform_util/frames.h>
 
@@ -88,8 +89,8 @@ namespace mapviz_plugins
     QObject::connect(ui_.start, SIGNAL(clicked()), this,
                      SLOT(StartPatrol()));
 
-    start_pub_ = node_.advertise<std_msgs::Empty>("path_ready", 1, false);
-    reset_pub_ = node_.advertise<std_msgs::Empty>("path_reset", 1, false);
+    start_srv_client_ = node_.serviceClient<std_srvs::Trigger>("path_ready");
+    reset_srv_client_ = node_.serviceClient<std_srvs::Trigger>("path_reset");
     waypoints_sub_ = node_.subscribe("waypoints", 5, &DrawWaypointsPlugin::waypointsCallback, this);
   }
 
@@ -153,8 +154,8 @@ namespace mapviz_plugins
     vertices_.clear();
     transformed_vertices_.clear();
 
-    std_msgs::Empty empty;
-    reset_pub_.publish(empty);
+    std_srvs::Trigger trigger;
+    reset_srv_client_.call(trigger);
   }
 
   void DrawWaypointsPlugin::StartPatrol()
@@ -163,8 +164,8 @@ namespace mapviz_plugins
     {
       return;
     }
-    std_msgs::Empty empty;
-    start_pub_.publish(empty);
+    std_srvs::Trigger trigger;
+    start_srv_client_.call(trigger);
   }
 
   void DrawWaypointsPlugin::waypointsCallback(const geometry_msgs::PoseArray::ConstPtr &msg)

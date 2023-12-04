@@ -105,8 +105,8 @@ namespace mapviz_plugins
 
     std::string polygon_topic_;
     ros::Publisher polygon_pub_;
-    ros::Publisher start_pub_;
-    ros::Publisher reset_pub_;
+    ros::ServiceClient start_srv_client_;
+    ros::ServiceClient reset_srv_client_;
     ros::Subscriber waypoints_sub_;
 
     std::vector<tf::Vector3> vertices_;
