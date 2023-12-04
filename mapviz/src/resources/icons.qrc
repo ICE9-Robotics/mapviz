@@ -1,13 +1,20 @@
 <RCC>
-    <qresource prefix="/images">
-        <file>arrow_in.png</file>
-        <file>image-x-generic.png</file>
-        <file>media-playback-pause.png</file>
-        <file>media-playback-stop.png</file>
-        <file>media-record.png</file>
-        <file>remove-icon-th.png</file>
-        <file>green-arrow.png</file>
-        <file>start_arrow.png</file>
-        <file>send_arrow.png</file>
-    </qresource>
+  <qresource prefix="/images">
+    <file>green_arrow_cursor.png</file>
+    <file>location_icon_cursor.png</file>
+    <file>green_arrow.png</file>
+    <file>matcher_icon.png</file>
+    <file>location_icon.png</file>
+    <file>patrol_icon.png</file>
+    <file>flip_icon.png</file>
+    <file>arrow_in.png</file>
+    <file>image-x-generic.png</file>
+    <file>media-playback-pause.png</file>
+    <file>media-playback-stop.png</file>
+    <file>media-record.png</file>
+    <file>remove-icon-th.png</file>
+    <file>green-arrow.png</file>
+    <file>start_arrow.png</file>
+    <file>send_arrow.png</file>
+  </qresource>
 </RCC>

@@ -111,6 +111,7 @@ set(UI_FILES
     ui/draw_waypoints_config.ui
     ui/matcher_config.ui
     ui/ugi_diagnostics_config.ui
+    ui/ugi_basestation_config.ui
 )
 
 set(SRC_FILES
@@ -150,6 +151,7 @@ set(SRC_FILES
     src/draw_waypoints_plugin.cpp
     src/matcher_plugin.cpp
     src/ugi_diagnostics_plugin.cpp
+    src/ugi_basestation_plugin.cpp
 )
 
 set(HEADER_FILES
@@ -190,6 +192,7 @@ set(HEADER_FILES
     include/${PROJECT_NAME}/draw_waypoints_plugin.h
     include/${PROJECT_NAME}/matcher_plugin.h
     include/${PROJECT_NAME}/ugi_diagnostics_plugin.h
+    include/${PROJECT_NAME}/ugi_basestation_plugin.h
 )
 
 qt5_wrap_ui(UI_SRC_FILES ${UI_FILES})
