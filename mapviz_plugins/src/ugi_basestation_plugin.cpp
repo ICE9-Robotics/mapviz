@@ -558,7 +558,7 @@ namespace mapviz_plugins
   {
     bool connected = move_base_client_.isServerConnected();
     ui_.pushButtonNavAbort->setEnabled(connected);
-    ui_.pushButtonNavSetGoal->setEnabled(true);
+    ui_.pushButtonNavSetGoal->setEnabled(connected);
     ui_.pushButtonPatrolStart->setEnabled(connected);
 
     if (!connected)
