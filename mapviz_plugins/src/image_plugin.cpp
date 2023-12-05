@@ -58,7 +58,6 @@ namespace mapviz_plugins
     offset_y_(0),
     width_(320),
     height_(240),
-    transport_("default"),
     has_image_(false),
     last_width_(0),
     last_height_(0),
@@ -86,8 +85,6 @@ namespace mapviz_plugins
     QObject::connect(ui_.height, SIGNAL(valueChanged(double)), this, SLOT(SetHeight(double)));
     QObject::connect(this,SIGNAL(VisibleChanged(bool)),this,SLOT(SetSubscription(bool)));
     QObject::connect(ui_.keep_ratio, SIGNAL(toggled(bool)), this, SLOT(KeepRatioChanged(bool)));
-    QObject::connect(ui_.transport_combo_box, SIGNAL(activated(const QString&)),
-                     this, SLOT(SetTransport(const QString&)));
 
     ui_.width->setKeyboardTracking(false);
     ui_.height->setKeyboardTracking(false);
@@ -193,6 +190,7 @@ namespace mapviz_plugins
     }
 
   }
+
   void ImagePlugin::SetSubscription(bool visible)
   {
     if(topic_.empty())
@@ -210,13 +208,6 @@ namespace mapviz_plugins
     }
   }
 
-  void ImagePlugin::SetTransport(const QString& transport)
-  {
-    transport_ = transport.toStdString();
-    ROS_INFO("Changing image_transport to %s.", transport_.c_str());
-    TopicEdited();
-  }
-
   void ImagePlugin::KeepRatioChanged(bool checked)
   {
     ui_.height->setEnabled( !checked );
@@ -228,17 +219,14 @@ namespace mapviz_plugins
 
   void ImagePlugin::Resubscribe()
   {
-    if (transport_ == "default")
-    {
       force_resubscribe_ = true;
       TopicEdited();
-    }
   }
 
   void ImagePlugin::SelectTopic()
   {
     ros::master::TopicInfo topic = mapviz::SelectTopicDialog::selectTopic(
-      "sensor_msgs/Image");
+      "sensor_msgs/CompressedImage");
 
     if(topic.name.empty())
     {
@@ -271,8 +259,7 @@ namespace mapviz_plugins
     // Re-subscribe if either the topic or the image transport
     // have changed.
     if (force_resubscribe_ ||
-        topic != topic_ ||
-        image_sub_.getTransport() != transport_)
+        topic != topic_)
     {
       force_resubscribe_ = false;
       initialized_ = false;
@@ -284,32 +271,13 @@ namespace mapviz_plugins
 
       if (!topic_.empty())
       {
-        boost::shared_ptr<image_transport::ImageTransport> it;
-        if (transport_ == "default")
-        {
-          ROS_DEBUG("Using default transport.");
-          image_transport::ImageTransport it(node_);
-          image_sub_ = it.subscribe(topic_, 1, &ImagePlugin::imageCallback, this);
-        }
-        else
-        {
-          ROS_DEBUG("Setting transport to %s on %s.",
-                   transport_.c_str(), local_node_.getNamespace().c_str());
-
-          local_node_.setParam("image_transport", transport_);
-          image_transport::ImageTransport it(local_node_);
-          image_sub_ = it.subscribe(topic_, 1, &ImagePlugin::imageCallback, this,
-                                    image_transport::TransportHints(transport_,
-                                                                    ros::TransportHints(),
-                                                                    local_node_));
-        }
-
+        image_sub_ = local_node_.subscribe(topic_, 1, &ImagePlugin::imageCallback, this);
         ROS_INFO("Subscribing to %s", topic_.c_str());
       }
     }
   }
 
-  void ImagePlugin::imageCallback(const sensor_msgs::ImageConstPtr& image)
+  void ImagePlugin::imageCallback(const sensor_msgs::CompressedImageConstPtr& image)
   {
     if (!has_message_)
     {
@@ -331,7 +299,7 @@ namespace mapviz_plugins
 
     last_width_ = 0;
     last_height_ = 0;
-    original_aspect_ratio_ = (double)image->height / (double)image->width;
+    original_aspect_ratio_ = 1280/720;
 
     if( ui_.keep_ratio->isChecked() )
     {
@@ -515,20 +483,6 @@ namespace mapviz_plugins
     // Note that image_transport should be loaded before the
     // topic to make sure the transport is set appropriately before we
     // subscribe.
-    if (node["image_transport"])
-    {
-      node["image_transport"] >> transport_;
-      int index = ui_.transport_combo_box->findText( QString::fromStdString(transport_) );
-      if (index != -1)
-      {
-        ui_.transport_combo_box->setCurrentIndex(index);
-      }
-      else
-      {
-        ROS_WARN("Saved image transport %s is unavailable.",
-                 transport_.c_str());
-      }
-    }
 
     if (node["topic"])
     {
@@ -596,7 +550,6 @@ namespace mapviz_plugins
     emitter << YAML::Key << "width" << YAML::Value << width_;
     emitter << YAML::Key << "height" << YAML::Value << height_;
     emitter << YAML::Key << "keep_ratio" << YAML::Value << ui_.keep_ratio->isChecked();
-    emitter << YAML::Key << "image_transport" << YAML::Value << transport_;
   }
 
   std::string ImagePlugin::AnchorToString(Anchor anchor)
@@ -661,30 +614,12 @@ namespace mapviz_plugins
 
   void ImagePlugin::CreateLocalNode()
   {
-    // This is the same way ROS generates anonymous node names.
-    // See http://docs.ros.org/api/roscpp/html/this__node_8cpp_source.html
-    // Giving each image plugin a unique node means that we can control
-    // its image transport individually.
-    char buf[200];
-    snprintf(buf, sizeof(buf), "image_%llu", (unsigned long long)ros::WallTime::now().toNSec());
-    local_node_ = ros::NodeHandle(node_, buf);
+
   }
 
   void ImagePlugin::SetNode(const ros::NodeHandle& node)
   {
-    node_ = node;
-
-    // As soon as we have a node, we can find the available image transports
-    // and add them to our combo box.
-    image_transport::ImageTransport it(node_);
-    std::vector<std::string> transports = it.getLoadableTransports();
-    Q_FOREACH (const std::string& transport, transports)
-    {
-      QString qtransport = QString::fromStdString(transport).replace("image_transport/", "");
-      ui_.transport_combo_box->addItem(qtransport);
-    }
-
-    CreateLocalNode();
+    
   }
 }
 

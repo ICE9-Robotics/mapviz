@@ -45,10 +45,9 @@
 // ROS libraries
 #include <ros/ros.h>
 #include <tf/transform_datatypes.h>
-#include <sensor_msgs/Image.h>
+#include <sensor_msgs/CompressedImage.h>
 #include <opencv2/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
-#include <image_transport/image_transport.h>
 
 #include <mapviz/map_canvas.h>
 
@@ -112,7 +111,6 @@ namespace mapviz_plugins
     void SetWidth(double width);
     void SetHeight(double height);
     void SetSubscription(bool visible);
-    void SetTransport(const QString& transport);
     void KeepRatioChanged(bool checked);
 
   private:
@@ -126,7 +124,6 @@ namespace mapviz_plugins
     int offset_y_;
     double width_;
     double height_;
-    std::string transport_;
 
     bool force_resubscribe_;
     bool has_image_;
@@ -136,15 +133,15 @@ namespace mapviz_plugins
     double original_aspect_ratio_;
 
     ros::NodeHandle local_node_;
-    image_transport::Subscriber image_sub_;
+    ros::Subscriber image_sub_;
     bool has_message_;
 
-    sensor_msgs::Image image_;
+    sensor_msgs::CompressedImage image_;
 
     cv_bridge::CvImagePtr cv_image_;
     cv::Mat scaled_image_;
 
-    void imageCallback(const sensor_msgs::ImageConstPtr& image);
+    void imageCallback(const sensor_msgs::CompressedImageConstPtr& image);
 
     void ScaleImage(double width, double height);
     void DrawIplImage(cv::Mat *image);
