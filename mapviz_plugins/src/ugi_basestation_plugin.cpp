@@ -591,18 +591,16 @@ namespace mapviz_plugins
   void UgiBaseStationPlugin::fastTimerCallback(const ros::TimerEvent &)
   {
     ros::Time now = ros::Time::now();
-    double TIME_NO_NETWORK = 10.0;
-    double TIME_LONG_DELAY = 1.0;
     double diagTime = (now - diag_info_.timestamp).toSec();
     double highStateTime = (now - diag_info_.highStateTs).toSec();
     double gpsTime = (now - diag_info_.gpsStatusTs).toSec();
 
-    if (diagTime > TIME_NO_NETWORK)
+    if (diagTime > 10.0)
     {
       ui_.diag_network_status -> setText("No data, last activity " + QString::number(diagTime, 'f', 1) + "s ago");
       ui_.diag_network_status -> setStyleSheet("QLabel { background-color : red; color : white; }");
     }
-    else if (diagTime > TIME_LONG_DELAY)
+    else if (diagTime > 1.0)
     {
       ui_.diag_network_status -> setText("Delayed, last activity " + QString::number(diagTime, 'f', 1) + "s delay");
       ui_.diag_network_status -> setStyleSheet("QLabel { background-color : orange; color : white; }");
@@ -612,12 +610,12 @@ namespace mapviz_plugins
       ui_.diag_network_status -> setText("OK, last activity " + QString::number(diagTime, 'f', 1) + "s ago");
       ui_.diag_network_status -> setStyleSheet("QLabel { background-color : green; color : white; }");
     }
-    if (highStateTime > TIME_NO_NETWORK)
+    if (highStateTime > 10.0)
     {
       ui_.diag_robot_conn -> setText("No data, last activity " + QString::number(highStateTime, 'f', 1) + "s ago");
       ui_.diag_robot_conn -> setStyleSheet("QLabel { background-color : red; color : white; }");
     }
-    else if (highStateTime > TIME_LONG_DELAY)
+    else if (highStateTime > 1.0)
     {
       ui_.diag_robot_conn -> setText("Delayed, last activity " + QString::number(highStateTime, 'f', 1) + "s ago");
       ui_.diag_robot_conn -> setStyleSheet("QLabel { background-color : orange; color : white; }");
@@ -627,12 +625,12 @@ namespace mapviz_plugins
       ui_.diag_robot_conn -> setText("OK, last activity " + QString::number(highStateTime, 'f', 1) + "s ago");
       ui_.diag_robot_conn -> setStyleSheet("QLabel { background-color : green; color : white; }");
     }
-    if (gpsTime > TIME_NO_NETWORK)
+    if (gpsTime > 10.0)
     {
       ui_.diag_gps_conn -> setText("No data, last activity " + QString::number(gpsTime, 'f', 1) + "s ago");
       ui_.diag_gps_conn -> setStyleSheet("QLabel { background-color : red; color : white; }");
     }
-    else if (gpsTime > TIME_LONG_DELAY)
+    else if (gpsTime > 2.0)
     {
       ui_.diag_gps_conn -> setText("Delayed, last activity " + QString::number(gpsTime, 'f', 1) + "s ago");
       ui_.diag_gps_conn -> setStyleSheet("QLabel { background-color : orange; color : white; }");

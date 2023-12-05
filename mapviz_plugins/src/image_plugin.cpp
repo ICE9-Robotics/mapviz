@@ -299,8 +299,7 @@ namespace mapviz_plugins
 
     last_width_ = 0;
     last_height_ = 0;
-    original_aspect_ratio_ = 1280/720;
-
+    original_aspect_ratio_ = cv_image_->image.rows * 1.0 / cv_image_->image.cols;
     if( ui_.keep_ratio->isChecked() )
     {
       double height =  width_ * original_aspect_ratio_;
