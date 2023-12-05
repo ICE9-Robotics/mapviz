@@ -94,9 +94,9 @@ namespace mapviz_plugins
     QWidget* GetConfigWidget(QWidget* parent);
 
   protected:
-    void PrintError(const std::string& message);
-    void PrintInfo(const std::string& message);
-    void PrintWarning(const std::string& message);
+    void PrintError(const std::string& message) {}
+    void PrintInfo(const std::string& message) {}
+    void PrintWarning(const std::string& message) {}
     virtual bool eventFilter(QObject *object, QEvent* event) override;
 
     bool handleMousePress(QMouseEvent *);

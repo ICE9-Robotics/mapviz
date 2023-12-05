@@ -234,21 +234,6 @@ namespace mapviz_plugins
     emitter << YAML::Key << "color" << YAML::Value << color;
   }
 
-  void UgiBaseStationPlugin::PrintError(const std::string &message)
-  {
-    // PrintErrorHelper(ui_.status, message);
-  }
-
-  void UgiBaseStationPlugin::PrintInfo(const std::string &message)
-  {
-    // PrintInfoHelper(ui_.status, message);
-  }
-
-  void UgiBaseStationPlugin::PrintWarning(const std::string &message)
-  {
-    // PrintWarningHelper(ui_.status, message);
-  }
-
   bool UgiBaseStationPlugin::eventFilter(QObject *object, QEvent *event)
   {
     switch (event->type())
