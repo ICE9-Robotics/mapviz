@@ -32,7 +32,7 @@
       </font>
      </property>
      <property name="title">
-      <string>Mode</string>
+      <string>Control</string>
      </property>
      <widget class="QPushButton" name="pushButtonModeIdle">
       <property name="geometry">
@@ -344,7 +344,7 @@ background-color:rgb(233, 185, 110);
      <widget class="QPushButton" name="pushButtonNavSetGoal">
       <property name="geometry">
        <rect>
-        <x>150</x>
+        <x>10</x>
         <y>30</y>
         <width>135</width>
         <height>25</height>
@@ -392,7 +392,7 @@ background-color:rgb(233, 185, 110);
      <widget class="QPushButton" name="pushButtonNavAbort">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>150</x>
         <y>30</y>
         <width>135</width>
         <height>25</height>
