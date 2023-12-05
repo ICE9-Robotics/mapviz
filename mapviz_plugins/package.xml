@@ -43,6 +43,7 @@
   <depend>visualization_msgs</depend>
   <depend>rtkgps_odom_matcher</depend>
   <depend>unitree_diagnostics_msgs</depend>
+  <depend>unitree_legged_msgs</depend>
   
   <exec_depend>libqt5-core</exec_depend>
   <exec_depend>libqt5-opengl</exec_depend>

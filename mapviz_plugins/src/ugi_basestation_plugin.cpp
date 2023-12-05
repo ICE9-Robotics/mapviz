@@ -37,6 +37,7 @@
 #include <geometry_msgs/PolygonStamped.h>
 #include <std_srvs/Trigger.h>
 #include <rtkgps_odom_matcher/SetPose.h>
+#include <unitree_legged_msgs/SetUnitreeHLMode.h>
 
 // Declare plugin
 #include <pluginlib/class_list_macros.h>
@@ -68,12 +69,21 @@ namespace mapviz_plugins
 
     QObject::connect(ui_.pushButtonNavAbort, SIGNAL(clicked()), this, SLOT(on_pushButtonNavAbort_clicked()));
     QObject::connect(ui_.pushButtonNavSetGoal, SIGNAL(toggled(bool)), this, SLOT(on_pushButtonNavSetGoal_toggled(bool)));
+
     QObject::connect(ui_.pushButtonMatcherFlip, SIGNAL(clicked()), this, SLOT(on_pushButtonFlip_clicked()));
     QObject::connect(ui_.pushButtonMatcherStart, SIGNAL(toggled(bool)), this, SLOT(on_pushButtonStartStop_toggled(bool)));
+
     QObject::connect(ui_.pushButtonPatrolDrawWp, SIGNAL(toggled(bool)), this, SLOT(on_pushButtonPatrolDrawWp_toggled(bool)));
     QObject::connect(ui_.pushButtonPatrolSendWp, SIGNAL(clicked()), this, SLOT(on_pushButtonPatrolSendWp_clicked()));
     QObject::connect(ui_.pushButtonPatrolStart, SIGNAL(toggled(bool)), this, SLOT(on_pushButtonPatrolStart_toggled(bool)));
     QObject::connect(ui_.pushButtonPatrolAbortClear, SIGNAL(clicked()), this, SLOT(on_pushButtonPatrolAbortClear_clicked()));
+
+    QObject::connect(ui_.pushButtonModeIdle, SIGNAL(clicked()), this, SLOT(on_pushButtonModeIdle_clicked()));
+    QObject::connect(ui_.pushButtonModeUp, SIGNAL(clicked()), this, SLOT(on_pushButtonModeUp_clicked()));
+    QObject::connect(ui_.pushButtonModeDown, SIGNAL(clicked()), this, SLOT(on_pushButtonModeDown_clicked()));
+    QObject::connect(ui_.pushButtonModeDamp, SIGNAL(clicked()), this, SLOT(on_pushButtonModeDamp_clicked()));
+    QObject::connect(ui_.pushButtonModeRecover, SIGNAL(clicked()), this, SLOT(on_pushButtonModeRecover_clicked()));
+    QObject::connect(ui_.pushButtonModeLock, SIGNAL(toggled(bool)), this, SLOT(on_pushButtonModeLock_toggled(bool)));
 
     matcher_start_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("start_match");
     matcher_stop_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("stop_match");
@@ -81,6 +91,7 @@ namespace mapviz_plugins
     path_ready_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("path_ready");
     path_stop_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("path_stop");
     path_reset_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("path_reset");
+    uhl_mode_srv_client_ = nh_.serviceClient<unitree_legged_msgs::SetUnitreeHLMode>("set_unitree_high_level_mode");
 
     polygon_pub_ = nh_.advertise<geometry_msgs::PolygonStamped>("polygon", 1, true);
     waypoints_sub_ = nh_.subscribe("waypoints", 5, &UgiBaseStationPlugin::waypointsCallback, this);
@@ -537,6 +548,7 @@ namespace mapviz_plugins
     diag_info_.highStateTs = msg->highStateTimestamp;
     diag_info_.velocity = msg->velocity;
     diag_info_.yawSpeed = msg->yawSpeed;
+    diag_info_.mode = msg->mode;
   }
 
   void UgiBaseStationPlugin::slowTimerCallback(const ros::TimerEvent &)
@@ -590,6 +602,37 @@ namespace mapviz_plugins
 
   void UgiBaseStationPlugin::fastTimerCallback(const ros::TimerEvent &)
   {
+    if (diag_info_.mode == 5 || diag_info_.mode == 7)
+    {
+      ui_.pushButtonModeDamp->setEnabled(true);
+    } 
+    else if (!ui_.pushButtonModeLock->isChecked())
+    {
+      ui_.pushButtonModeDamp->setEnabled(false);
+    }
+
+    switch (diag_info_.mode)
+    {
+    case 0:
+      ui_.status_mode->setText("Idle");
+      break;
+    case 5:
+      ui_.status_mode->setText("Stand Down");
+      break;
+    case 6:
+      ui_.status_mode->setText("Stand Up");
+      break;
+    case 7:
+      ui_.status_mode->setText("Soft Stop");
+      break;
+    case 8:
+      ui_.status_mode->setText("Recovery");
+      break;
+    default:
+      ui_.status_mode->setText("Unknown");
+      break;
+    }
+
     ros::Time now = ros::Time::now();
     double diagTime = (now - diag_info_.timestamp).toSec();
     double highStateTime = (now - diag_info_.highStateTs).toSec();
@@ -809,5 +852,52 @@ namespace mapviz_plugins
 
     std_srvs::Trigger trigger;
     path_ready_srv_client_.call(trigger);
+  }
+
+  void UgiBaseStationPlugin::on_pushButtonModeIdle_clicked()
+  {
+    unitree_legged_msgs::SetUnitreeHLMode mode;
+    mode.request.mode = 0;
+    uhl_mode_srv_client_.call(mode);
+  }
+
+  void UgiBaseStationPlugin::on_pushButtonModeUp_clicked()
+  {
+    unitree_legged_msgs::SetUnitreeHLMode mode;
+    mode.request.mode = 6;
+    uhl_mode_srv_client_.call(mode);
+  }
+
+  void UgiBaseStationPlugin::on_pushButtonModeDown_clicked()
+  {
+    unitree_legged_msgs::SetUnitreeHLMode mode;
+    mode.request.mode = 5;
+    uhl_mode_srv_client_.call(mode);
+  }
+
+  void UgiBaseStationPlugin::on_pushButtonModeDamp_clicked()
+  {
+    unitree_legged_msgs::SetUnitreeHLMode mode;
+    mode.request.mode = 7;
+    uhl_mode_srv_client_.call(mode);
+  }
+
+  void UgiBaseStationPlugin::on_pushButtonModeRecover_clicked()
+  {
+    unitree_legged_msgs::SetUnitreeHLMode mode;
+    mode.request.mode = 8;
+    uhl_mode_srv_client_.call(mode);
+  }
+
+  void UgiBaseStationPlugin::on_pushButtonModeLock_toggled(bool checked)
+  {
+    if (checked)
+    {
+      ui_.pushButtonModeDamp->setEnabled(true);
+    }
+    else if (diag_info_.mode != 5)
+    {
+      ui_.pushButtonModeDamp->setEnabled(false);
+    }
   }
 }

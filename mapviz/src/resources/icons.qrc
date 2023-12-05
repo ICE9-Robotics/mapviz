@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="/images">
+    <file>locked_icon.png</file>
+    <file>unlocked_icon.png</file>
     <file>green_arrow_cursor.png</file>
     <file>location_icon_cursor.png</file>
     <file>green_arrow.png</file>

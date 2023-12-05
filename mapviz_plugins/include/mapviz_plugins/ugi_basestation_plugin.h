@@ -67,6 +67,7 @@ namespace mapviz_plugins
     double yawSpeed = 0.0;
     double commandVelocity = 0.0;
     double commandYawSpeed =0.0;
+    int mode = 0;
     std::string gpsStatusDescription = "No fix";
   };
 
@@ -112,6 +113,12 @@ namespace mapviz_plugins
     void on_pushButtonPatrolSendWp_clicked();
     void on_pushButtonPatrolStart_toggled(bool checked);
     void on_pushButtonPatrolAbortClear_clicked();
+    void on_pushButtonModeIdle_clicked();
+    void on_pushButtonModeUp_clicked();
+    void on_pushButtonModeDown_clicked();
+    void on_pushButtonModeDamp_clicked();
+    void on_pushButtonModeRecover_clicked();
+    void on_pushButtonModeLock_toggled(bool checked);
 
   private:
     bool is_mouse_down_;
@@ -148,6 +155,7 @@ namespace mapviz_plugins
     ros::ServiceClient path_stop_srv_client_;
     ros::ServiceClient path_ready_srv_client_;
     ros::ServiceClient path_reset_srv_client_;
+    ros::ServiceClient uhl_mode_srv_client_;
     ros::Timer slow_timer_;
     ros::Timer fast_timer_;
 

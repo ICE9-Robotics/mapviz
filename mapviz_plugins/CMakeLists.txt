@@ -28,6 +28,7 @@ set(DEPENDENCIES
   visualization_msgs
   rtkgps_odom_matcher
   unitree_diagnostics_msgs
+  unitree_legged_msgs
 )
 
 find_package(catkin REQUIRED COMPONENTS ${DEPENDENCIES})
