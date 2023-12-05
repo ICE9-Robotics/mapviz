@@ -658,11 +658,11 @@ namespace mapviz_plugins
       ui_.diag_gps_conn -> setStyleSheet("QLabel { background-color : green; color : white; }");
     }
     
-    ui_.diag_vel -> setText(QString::number(diag_info_.velocity, 'f', 3) + " / " 
-                                + QString::number(diag_info_.commandVelocity, 'f', 3)  + " m/s");
-    ui_.diag_yaw -> setText(QString::number(diag_info_.yawSpeed * 180/3.14159, 'f', 1) + " / " 
-                                + QString::number(diag_info_.commandYawSpeed * 180/3.14159, 'f', 1) + " deg/s");
-    ui_.diag_battery -> setText(QString::number(diag_info_.batterySoC, 'f', 1) + "%");
+    ui_.diag_vel -> setText(QString::number(diag_info_.velocity, 'f', 3) + " | " 
+                                + QString::number(diag_info_.commandVelocity, 'f', 3));
+    ui_.diag_yaw -> setText(QString::number(diag_info_.yawSpeed * 180/3.14159, 'f', 1) + " | " 
+                                + QString::number(diag_info_.commandYawSpeed * 180/3.14159, 'f', 1));
+    ui_.diag_battery -> setText(QString::number(diag_info_.batterySoC, 'f', 1));
     if (diag_info_.batterySoC < 20)
     {
       ui_.diag_battery -> setStyleSheet("QLabel { background-color : red; color : white; }");
@@ -676,11 +676,11 @@ namespace mapviz_plugins
       ui_.diag_battery -> setStyleSheet("QLabel { background-color : green; color : white; }");
     }
     ui_.diag_gps_quality -> setText(QString::fromStdString(diag_info_.gpsStatusDescription));
-    if (diag_info_.gpsStatusDescription == "No Fix")
+    if (diag_info_.gpsStatusDescription == "No fix")
     {
       ui_.diag_gps_quality -> setStyleSheet("QLabel { background-color : red; color : white; }");
     }
-    else if (diag_info_.gpsStatusDescription == "RTK Fix" || diag_info_.gpsStatusDescription == "RTK Float")
+    else if (diag_info_.gpsStatusDescription == "RTK fixed" || diag_info_.gpsStatusDescription == "RTK float" || diag_info_.gpsStatusDescription == "RTK fixed/float") 
     {
       ui_.diag_gps_quality -> setStyleSheet("QLabel { background-color : green; color : white; }");
     }

@@ -104,6 +104,11 @@ Mapviz::Mapviz(bool is_standalone, int argc, char** argv, QWidget *parent, Qt::W
 {
   ui_.setupUi(this);
 
+  QPalette palette;
+  palette.setColor(QPalette::Highlight, ui_.actions->palette().color(QPalette::Base));
+  palette.setColor(QPalette::HighlightedText, ui_.actions->palette().color(QPalette::Text));
+  ui_.actions->setPalette(palette);
+
   xy_pos_label_->setVisible(false);
   lat_lon_pos_label_->setVisible(false);
 

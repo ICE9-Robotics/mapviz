@@ -62,12 +62,12 @@ namespace mapviz_plugins
     ros::Time timestamp;
     ros::Time highStateTs;
     ros::Time gpsStatusTs;
-    int batterySoC;
-    double velocity;
-    double yawSpeed;
-    double commandVelocity;
-    double commandYawSpeed;
-    std::string gpsStatusDescription;
+    int batterySoC = 0;
+    double velocity = 0.0;
+    double yawSpeed = 0.0;
+    double commandVelocity = 0.0;
+    double commandYawSpeed =0.0;
+    std::string gpsStatusDescription = "No fix";
   };
 
   class UgiBaseStationPlugin : public mapviz::MapvizPlugin
