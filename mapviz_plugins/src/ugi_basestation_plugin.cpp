@@ -986,7 +986,7 @@ namespace mapviz_plugins
     ui_.doubleSpinBoxYawSpd->setValue(0.3);
     ui_.doubleSpinBoxLinearAcc->setValue(0.4);
     ui_.doubleSpinBoxYawAcc->setValue(0.3);
-    ui_.doubleSpinBoxCamExp->setValue(140);
+    ui_.doubleSpinBoxCamExp->setValue(128);
     ui_.doubleSpinBoxCamBright->setValue(70);
     ui_.checkBoxCamAutoExp->setChecked(true);
   }
