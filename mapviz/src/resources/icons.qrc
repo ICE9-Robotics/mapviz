@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/images">
+    <file>reset_icon.png</file>
     <file>locked_icon.png</file>
     <file>unlocked_icon.png</file>
     <file>green_arrow_cursor.png</file>

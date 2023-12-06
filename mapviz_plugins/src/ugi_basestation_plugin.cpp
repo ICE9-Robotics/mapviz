@@ -70,8 +70,9 @@ namespace mapviz_plugins
     QObject::connect(ui_.pushButtonNavAbort, SIGNAL(clicked()), this, SLOT(on_pushButtonNavAbort_clicked()));
     QObject::connect(ui_.pushButtonNavSetGoal, SIGNAL(toggled(bool)), this, SLOT(on_pushButtonNavSetGoal_toggled(bool)));
 
-    QObject::connect(ui_.pushButtonMatcherFlip, SIGNAL(clicked()), this, SLOT(on_pushButtonFlip_clicked()));
-    QObject::connect(ui_.pushButtonMatcherStart, SIGNAL(toggled(bool)), this, SLOT(on_pushButtonStartStop_toggled(bool)));
+    QObject::connect(ui_.pushButtonMatcherFlip, SIGNAL(clicked()), this, SLOT(on_pushButtonMatcherFlip_clicked()));
+    QObject::connect(ui_.pushButtonMatcherStart, SIGNAL(toggled(bool)), this, SLOT(on_pushButtonMatcherStart_toggled(bool)));
+    QObject::connect(ui_.pushButtonMatcherReset, SIGNAL(clicked()), this, SLOT(on_pushButtonMatcherReset_clicked()));
 
     QObject::connect(ui_.pushButtonPatrolDrawWp, SIGNAL(toggled(bool)), this, SLOT(on_pushButtonPatrolDrawWp_toggled(bool)));
     QObject::connect(ui_.pushButtonPatrolSendWp, SIGNAL(clicked()), this, SLOT(on_pushButtonPatrolSendWp_clicked()));
@@ -88,6 +89,7 @@ namespace mapviz_plugins
     matcher_start_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("start_match");
     matcher_stop_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("stop_match");
     matcher_flip_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("flip_match");
+    matcher_reset_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("reset_match");
     path_ready_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("path_ready");
     path_stop_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("path_stop");
     path_reset_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("path_reset");
@@ -189,9 +191,9 @@ namespace mapviz_plugins
       transformed_vertices_[i] = transform * vertices_[i];
     }
 
-    glLineWidth(1);
+    glLineWidth(5);
     const QColor color = ui_.colorButtonWpColor->color();
-    glColor4d(color.redF(), color.greenF(), color.blueF(), 1.0);
+    glColor4d(color.redF(), color.greenF(), color.blueF(), 0.8);
     glBegin(GL_LINE_STRIP);
 
     for (const auto &vertex : transformed_vertices_)
@@ -203,7 +205,7 @@ namespace mapviz_plugins
 
     glBegin(GL_LINES);
 
-    glColor4d(color.redF(), color.greenF(), color.blueF(), 0.25);
+    glColor4d(color.redF(), color.greenF(), color.blueF(), 0.4);
 
     if (transformed_vertices_.size() > 2)
     {
@@ -214,9 +216,10 @@ namespace mapviz_plugins
     glEnd();
 
     // Draw vertices
-    glPointSize(9);
+    glPointSize(20);
     glBegin(GL_POINTS);
 
+    glColor4d(color.redF(), color.greenF(), color.blueF(), 0.8);
     for (const auto &vertex : transformed_vertices_)
     {
       glVertex2d(vertex.x(), vertex.y());
@@ -527,12 +530,12 @@ namespace mapviz_plugins
     if (vertices_.size() == msg->poses.size())
     {
       is_waypoints_ok_ = true;
-      PrintInfo("Feedback OK");
+      PrintInfoHelper(ui_.status_patrol, "Feedback OK");
     }
     else
     {
       is_waypoints_ok_ = false;
-      PrintError("Waypoints not received correctly");
+      PrintErrorHelper(ui_.status_patrol, "Waypoints not received correctly");
       ROS_ERROR_STREAM(vertices_.size() << "  " << msg->poses.size());
     }
   }
@@ -616,6 +619,15 @@ namespace mapviz_plugins
     case 0:
       ui_.status_mode->setText("Idle");
       break;
+    case 1:
+      ui_.status_mode->setText("Force Stand");
+      break;
+    case 2:
+      ui_.status_mode->setText("Walk");
+      break;
+    case 3:
+      ui_.status_mode->setText("Walk towards Target");
+      break;
     case 5:
       ui_.status_mode->setText("Stand Down");
       break;
@@ -627,6 +639,14 @@ namespace mapviz_plugins
       break;
     case 8:
       ui_.status_mode->setText("Recovery");
+      break;
+    case 9:
+      ui_.status_mode->setText("Backflip");
+      break;
+    case 10:
+      ui_.status_mode->setText("Yaw Jump");
+    case 11:
+      ui_.status_mode->setText("Praying");
       break;
     default:
       ui_.status_mode->setText("Unknown");
@@ -773,6 +793,19 @@ namespace mapviz_plugins
     }
   }
 
+  void UgiBaseStationPlugin::on_pushButtonMatcherReset_clicked()
+  {
+    std_srvs::Trigger trigger;
+    if (matcher_reset_srv_client_.call(trigger))
+    {
+      PrintInfoHelper(ui_.status_matcher, "Reset successful");
+    }
+    else
+    {
+      PrintErrorHelper(ui_.status_matcher, "Failed to reset");
+    }
+  }
+
   void UgiBaseStationPlugin::on_pushButtonPatrolDrawWp_toggled(bool checked)
   {
     bool navSetGoal_checked = ui_.pushButtonNavSetGoal->isChecked();
@@ -814,7 +847,7 @@ namespace mapviz_plugins
 
   void UgiBaseStationPlugin::on_pushButtonPatrolStart_toggled(bool checked)
   {
-    if (!checked)
+    if (checked)
     {
       if (!is_waypoints_ok_)
       {
@@ -847,11 +880,16 @@ namespace mapviz_plugins
 
   void UgiBaseStationPlugin::on_pushButtonPatrolAbortClear_clicked()
   {
+    if (ui_.pushButtonPatrolStart->isChecked())
+    {
+      ui_.pushButtonPatrolStart->setChecked(false);
+    }
+
     vertices_.clear();
     transformed_vertices_.clear();
 
     std_srvs::Trigger trigger;
-    path_ready_srv_client_.call(trigger);
+    path_reset_srv_client_.call(trigger);
   }
 
   void UgiBaseStationPlugin::on_pushButtonModeIdle_clicked()

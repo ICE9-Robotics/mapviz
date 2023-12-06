@@ -107,12 +107,16 @@ namespace mapviz_plugins
   private Q_SLOTS:
     void on_pushButtonNavSetGoal_toggled(bool checked);
     void on_pushButtonNavAbort_clicked();
+
     void on_pushButtonMatcherFlip_clicked();
     void on_pushButtonMatcherStart_toggled(bool checked);
+    void on_pushButtonMatcherReset_clicked();
+
     void on_pushButtonPatrolDrawWp_toggled(bool checked);
     void on_pushButtonPatrolSendWp_clicked();
     void on_pushButtonPatrolStart_toggled(bool checked);
     void on_pushButtonPatrolAbortClear_clicked();
+
     void on_pushButtonModeIdle_clicked();
     void on_pushButtonModeUp_clicked();
     void on_pushButtonModeDown_clicked();
@@ -152,6 +156,7 @@ namespace mapviz_plugins
     ros::ServiceClient matcher_start_srv_client_;
     ros::ServiceClient matcher_stop_srv_client_;
     ros::ServiceClient matcher_flip_srv_client_;
+    ros::ServiceClient matcher_reset_srv_client_;
     ros::ServiceClient path_stop_srv_client_;
     ros::ServiceClient path_ready_srv_client_;
     ros::ServiceClient path_reset_srv_client_;

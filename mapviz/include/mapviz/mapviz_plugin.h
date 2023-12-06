@@ -184,7 +184,7 @@ namespace mapviz
       {
         return true;
       }
-      else if (elapsed.toSec() < 0.1)
+      else //if (elapsed.toSec() < 0.2)
       {
         // If the stamped transform failed because it is too recent, find the
         // most recent transform in the cache instead.
