@@ -86,6 +86,11 @@ namespace mapviz_plugins
     QObject::connect(ui_.pushButtonModeRecover, SIGNAL(clicked()), this, SLOT(on_pushButtonModeRecover_clicked()));
     QObject::connect(ui_.pushButtonModeLock, SIGNAL(toggled(bool)), this, SLOT(on_pushButtonModeLock_toggled(bool)));
 
+    QObject::connect(ui_.pushButtonSettingRevert, SIGNAL(clicked()), this, SLOT(on_pushButtonSettingRevert_clicked()));
+    QObject::connect(ui_.pushButtonSettingRestore, SIGNAL(clicked()), this, SLOT(on_pushButtonSettingRestore_clicked()));
+    QObject::connect(ui_.pushButtonSettingApply, SIGNAL(clicked()), this, SLOT(on_pushButtonSettingApply_clicked()));
+
+
     matcher_start_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("start_match");
     matcher_stop_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("stop_match");
     matcher_flip_srv_client_ = nh_.serviceClient<std_srvs::Trigger>("flip_match");
@@ -101,6 +106,8 @@ namespace mapviz_plugins
 
     slow_timer_ = nh_.createTimer(ros::Duration(1.0), &UgiBaseStationPlugin::slowTimerCallback, this);
     fast_timer_ = nh_.createTimer(ros::Duration(0.1), &UgiBaseStationPlugin::fastTimerCallback, this);
+
+    on_pushButtonSettingRevert_clicked();
   }
 
   UgiBaseStationPlugin::~UgiBaseStationPlugin()
@@ -748,10 +755,9 @@ namespace mapviz_plugins
       QPixmap cursor_pixmap = QPixmap(":/images/green_arrow_cursor.png");
       QApplication::setOverrideCursor(QCursor(cursor_pixmap));
     }
-    if (!checked && !patrolDrawWp_checked)
+    if (!checked)
     {
       QApplication::restoreOverrideCursor();
-      QApplication::setOverrideCursor(Qt::ArrowCursor);
     }
   }
 
@@ -763,12 +769,22 @@ namespace mapviz_plugins
   void UgiBaseStationPlugin::on_pushButtonMatcherFlip_clicked()
   {
     std_srvs::Trigger trigger;
-    matcher_flip_srv_client_.call(trigger);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    if (matcher_flip_srv_client_.call(trigger))
+    {
+      PrintInfoHelper(ui_.status_matcher, "Flip match successful");
+    }
+    else
+    {
+      PrintErrorHelper(ui_.status_matcher, "Failed to flip match");
+    }
+    QApplication::restoreOverrideCursor();
   }
 
   void UgiBaseStationPlugin::on_pushButtonMatcherStart_toggled(bool checked)
   {
     std_srvs::Trigger trigger;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     if (checked)
     {
       if (matcher_start_srv_client_.call(trigger))
@@ -791,11 +807,13 @@ namespace mapviz_plugins
         PrintErrorHelper(ui_.status_matcher, "Failed to stop");
       }
     }
+    QApplication::restoreOverrideCursor();
   }
 
   void UgiBaseStationPlugin::on_pushButtonMatcherReset_clicked()
   {
     std_srvs::Trigger trigger;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     if (matcher_reset_srv_client_.call(trigger))
     {
       PrintInfoHelper(ui_.status_matcher, "Reset successful");
@@ -804,6 +822,7 @@ namespace mapviz_plugins
     {
       PrintErrorHelper(ui_.status_matcher, "Failed to reset");
     }
+    QApplication::restoreOverrideCursor();
   }
 
   void UgiBaseStationPlugin::on_pushButtonPatrolDrawWp_toggled(bool checked)
@@ -816,12 +835,12 @@ namespace mapviz_plugins
         ui_.pushButtonNavSetGoal->setChecked(false);
       }
       QPixmap cursor_pixmap = QPixmap(":/images/location_icon_cursor.png");
+      QApplication::restoreOverrideCursor();
       QApplication::setOverrideCursor(QCursor(cursor_pixmap));
     }
-    if (!checked && !navSetGoal_checked)
+    if (!checked)
     {
       QApplication::restoreOverrideCursor();
-      QApplication::setOverrideCursor(Qt::ArrowCursor);
     }
   }
 
@@ -847,6 +866,7 @@ namespace mapviz_plugins
 
   void UgiBaseStationPlugin::on_pushButtonPatrolStart_toggled(bool checked)
   {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     if (checked)
     {
       if (!is_waypoints_ok_)
@@ -876,6 +896,7 @@ namespace mapviz_plugins
         PrintErrorHelper(ui_.status_patrol, "Failed to stop");
       }
     }
+    QApplication::restoreOverrideCursor();
   }
 
   void UgiBaseStationPlugin::on_pushButtonPatrolAbortClear_clicked()
@@ -889,42 +910,61 @@ namespace mapviz_plugins
     transformed_vertices_.clear();
 
     std_srvs::Trigger trigger;
-    path_reset_srv_client_.call(trigger);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    if (path_reset_srv_client_.call(trigger))
+    {
+      PrintInfoHelper(ui_.status_patrol, "Reset successful");
+    }
+    else
+    {
+      PrintErrorHelper(ui_.status_patrol, "Failed to reset");
+    }
+    QApplication::restoreOverrideCursor();
   }
 
   void UgiBaseStationPlugin::on_pushButtonModeIdle_clicked()
   {
     unitree_legged_msgs::SetUnitreeHLMode mode;
     mode.request.mode = 0;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     uhl_mode_srv_client_.call(mode);
+    QApplication::restoreOverrideCursor();
   }
 
   void UgiBaseStationPlugin::on_pushButtonModeUp_clicked()
   {
     unitree_legged_msgs::SetUnitreeHLMode mode;
     mode.request.mode = 6;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     uhl_mode_srv_client_.call(mode);
+    QApplication::restoreOverrideCursor();
   }
 
   void UgiBaseStationPlugin::on_pushButtonModeDown_clicked()
   {
     unitree_legged_msgs::SetUnitreeHLMode mode;
     mode.request.mode = 5;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     uhl_mode_srv_client_.call(mode);
+    QApplication::restoreOverrideCursor();
   }
 
   void UgiBaseStationPlugin::on_pushButtonModeDamp_clicked()
   {
     unitree_legged_msgs::SetUnitreeHLMode mode;
     mode.request.mode = 7;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     uhl_mode_srv_client_.call(mode);
+    QApplication::restoreOverrideCursor();
   }
 
   void UgiBaseStationPlugin::on_pushButtonModeRecover_clicked()
   {
     unitree_legged_msgs::SetUnitreeHLMode mode;
     mode.request.mode = 8;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     uhl_mode_srv_client_.call(mode);
+    QApplication::restoreOverrideCursor();
   }
 
   void UgiBaseStationPlugin::on_pushButtonModeLock_toggled(bool checked)
@@ -936,6 +976,156 @@ namespace mapviz_plugins
     else if (diag_info_.mode != 5)
     {
       ui_.pushButtonModeDamp->setEnabled(false);
+    }
+  }
+
+  void UgiBaseStationPlugin::on_pushButtonSettingRestore_clicked()
+  {
+    ui_.doubleSpinBoxFwVel->setValue(0.3);
+    ui_.doubleSpinBoxBwVel->setValue(0.12);
+    ui_.doubleSpinBoxYawSpd->setValue(0.3);
+    ui_.doubleSpinBoxLinearAcc->setValue(0.4);
+    ui_.doubleSpinBoxYawAcc->setValue(0.3);
+    ui_.doubleSpinBoxCamExp->setValue(140);
+    ui_.doubleSpinBoxCamBright->setValue(70);
+    ui_.checkBoxCamAutoExp->setChecked(true);
+  }
+
+  void UgiBaseStationPlugin::on_pushButtonSettingRevert_clicked()
+  {
+    int result_flag = 0;
+    dynamic_reconfigure::ReconfigureRequest srv_req;
+    dynamic_reconfigure::ReconfigureResponse srv_resp;
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    if (ros::service::call("/slam_planner_node/DBLocalPlannerROS/set_parameters", srv_req, srv_resp))
+    {
+      result_flag += 1;
+    }
+    QApplication::restoreOverrideCursor();
+
+    for (const auto &param : srv_resp.config.doubles)
+    {
+      if (param.name == "max_vel_x")
+      {
+        ui_.doubleSpinBoxFwVel->setValue(param.value);
+      }
+      else if (param.name == "max_vel_x_backwards")
+      {
+        ui_.doubleSpinBoxBwVel->setValue(param.value);
+      }
+      else if (param.name == "max_vel_theta")
+      {
+        ui_.doubleSpinBoxYawSpd->setValue(param.value);
+      }
+      else if (param.name == "acc_lim_x")
+      {
+        ui_.doubleSpinBoxLinearAcc->setValue(param.value);
+      }
+      else if (param.name == "acc_lim_theta")
+      {
+        ui_.doubleSpinBoxYawAcc->setValue(param.value);
+      }
+    }
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    if (ros::service::call("/mjpeg_cam/set_parameters", srv_req, srv_resp))
+    {
+      result_flag += 2;
+    }
+    QApplication::restoreOverrideCursor();
+
+    for (const auto &param : srv_resp.config.ints)
+    {
+      if (param.name == "exposure")
+      {
+        ui_.doubleSpinBoxCamExp->setValue(param.value);
+      }
+      else if (param.name == "brightness")
+      {
+        ui_.doubleSpinBoxCamBright->setValue(param.value);
+      }
+    }
+    ui_.checkBoxCamAutoExp->setChecked(srv_resp.config.bools[0].value);
+
+    if (result_flag != 3)
+    {
+      PrintErrorHelper(ui_.status_settings, "Failed to contact server");
+    }
+    else
+    {
+      PrintInfoHelper(ui_.status_settings, "OK");
+    }
+  }
+
+  void UgiBaseStationPlugin::on_pushButtonSettingApply_clicked()
+  {
+    int result_flag = 0;
+    dynamic_reconfigure::ReconfigureRequest srv_req;
+    dynamic_reconfigure::ReconfigureResponse srv_resp;
+    dynamic_reconfigure::DoubleParameter double_param;
+    dynamic_reconfigure::IntParameter int_param;
+    dynamic_reconfigure::BoolParameter bool_param;
+    dynamic_reconfigure::Config conf;
+
+    double_param.name = "max_vel_x";
+    double_param.value = ui_.doubleSpinBoxFwVel->value();
+    conf.doubles.push_back(double_param);
+
+    double_param.name = "max_vel_x_backwards";
+    double_param.value = ui_.doubleSpinBoxBwVel->value();
+    conf.doubles.push_back(double_param);
+
+    double_param.name = "max_vel_theta";
+    double_param.value = ui_.doubleSpinBoxYawSpd->value();
+    conf.doubles.push_back(double_param);
+
+    double_param.name = "acc_lim_x";
+    double_param.value = ui_.doubleSpinBoxLinearAcc->value();
+    conf.doubles.push_back(double_param);
+
+    double_param.name = "acc_lim_theta";
+    double_param.value = ui_.doubleSpinBoxYawAcc->value();
+    conf.doubles.push_back(double_param);
+    
+    srv_req.config = conf;
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    if (ros::service::call("/slam_planner_node/DBLocalPlannerROS/set_parameters", srv_req, srv_resp))
+    {
+      result_flag += 1;
+    }
+    QApplication::restoreOverrideCursor();
+
+    conf.doubles.clear();
+
+    int_param.name = "exposure";
+    int_param.value = ui_.doubleSpinBoxCamExp->value();
+    conf.ints.push_back(int_param);
+
+    int_param.name = "brightness";
+    int_param.value = ui_.doubleSpinBoxCamBright->value();
+    conf.ints.push_back(int_param);
+
+    bool_param.name = "auto_exposure";
+    bool_param.value = ui_.checkBoxCamAutoExp->isChecked();
+    conf.bools.push_back(bool_param);
+    
+    srv_req.config = conf;
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    if (ros::service::call("/mjpeg_cam/set_parameters", srv_req, srv_resp))
+    {
+      result_flag += 2;
+    }
+    QApplication::restoreOverrideCursor();
+
+    if (result_flag != 3)
+    {
+      PrintErrorHelper(ui_.status_settings, "Failed to contact servier");
+    }
+    else
+    {
+      PrintInfoHelper(ui_.status_settings, "OK");
     }
   }
 }

@@ -47,6 +47,9 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <unitree_diagnostics_msgs/Diagnostics.h>
 #include <actionlib/client/simple_action_client.h>
+#include <dynamic_reconfigure/DoubleParameter.h>
+#include <dynamic_reconfigure/Reconfigure.h>
+#include <dynamic_reconfigure/Config.h>
 
 // Mapviz libraries
 #include <mapviz/map_canvas.h>
@@ -123,6 +126,15 @@ namespace mapviz_plugins
     void on_pushButtonModeDamp_clicked();
     void on_pushButtonModeRecover_clicked();
     void on_pushButtonModeLock_toggled(bool checked);
+
+    void on_doubleSpinBoxFwVel_valueChanged(double val);
+    void on_doubleSpinBoxBwVel_valueChanged(double val);
+    void on_doubleSpinBoxYawVel_valueChanged(double val);
+    void on_doubleSpinBoxLinearAcc_valueChanged(double val);
+    void on_doubleSpinBoxYawAcc_valueChanged(double val);
+    void on_pushButtonSettingRevert_clicked();
+    void on_pushButtonSettingRestore_clicked();
+    void on_pushButtonSettingApply_clicked();
 
   private:
     bool is_mouse_down_;
