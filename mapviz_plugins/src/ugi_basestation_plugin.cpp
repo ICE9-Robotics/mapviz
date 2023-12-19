@@ -106,8 +106,6 @@ namespace mapviz_plugins
 
     slow_timer_ = nh_.createTimer(ros::Duration(1.0), &UgiBaseStationPlugin::slowTimerCallback, this);
     fast_timer_ = nh_.createTimer(ros::Duration(0.1), &UgiBaseStationPlugin::fastTimerCallback, this);
-
-    on_pushButtonSettingRevert_clicked();
   }
 
   UgiBaseStationPlugin::~UgiBaseStationPlugin()
@@ -549,16 +547,16 @@ namespace mapviz_plugins
 
   void UgiBaseStationPlugin::diagnosticsCallback(const unitree_diagnostics_msgs::Diagnostics::ConstPtr& msg)
   {
-    diag_info_.timestamp = msg->header.stamp;
-    diag_info_.batterySoC = msg->batterySoC;
-    diag_info_.commandVelocity = msg->commandVelocity;
-    diag_info_.commandYawSpeed = msg->commandYawSpeed;
-    diag_info_.gpsStatusTs = msg->gpsStatusTimestamp;
-    diag_info_.gpsStatusDescription = msg->gpsStatusDescription;
-    diag_info_.highStateTs = msg->highStateTimestamp;
-    diag_info_.velocity = msg->velocity;
-    diag_info_.yawSpeed = msg->yawSpeed;
-    diag_info_.mode = msg->mode;
+    diagnostic_info_.timestamp = msg->header.stamp;
+    diagnostic_info_.batterySoC = msg->batterySoC;
+    diagnostic_info_.commandVelocity = msg->commandVelocity;
+    diagnostic_info_.commandYawSpeed = msg->commandYawSpeed;
+    diagnostic_info_.gpsStatusTs = msg->gpsStatusTimestamp;
+    diagnostic_info_.gpsStatusDescription = msg->gpsStatusDescription;
+    diagnostic_info_.highStateTs = msg->highStateTimestamp;
+    diagnostic_info_.velocity = msg->velocity;
+    diagnostic_info_.yawSpeed = msg->yawSpeed;
+    diagnostic_info_.mode = msg->mode;
   }
 
   void UgiBaseStationPlugin::slowTimerCallback(const ros::TimerEvent &)
@@ -566,11 +564,17 @@ namespace mapviz_plugins
     bool connected = move_base_client_.isServerConnected();
     ui_.pushButtonNavAbort->setEnabled(connected);
     ui_.pushButtonNavSetGoal->setEnabled(connected);
+
+    ui_.pushButtonMatcherStart->setEnabled(connected);
     ui_.pushButtonPatrolStart->setEnabled(connected);
+
+    ui_.tabSettings->setEnabled(connected);
 
     if (!connected)
     {
+      ui_.pushButtonModeLock->setChecked(false);
       PrintErrorHelper(ui_.status_nav, "[move_base] server not connected");
+      PrintErrorHelper(ui_.status_settings, "ROS server not connected");
     }
     else if (!monitoring_action_state_)
     {
@@ -608,11 +612,17 @@ namespace mapviz_plugins
         break;
       }
     }
+  
+    if (connected && !is_settings_tab_initiated_)
+    {
+      on_pushButtonSettingRevert_clicked();
+      is_settings_tab_initiated_ = true;
+    }
   }
 
   void UgiBaseStationPlugin::fastTimerCallback(const ros::TimerEvent &)
   {
-    if (diag_info_.mode == 5 || diag_info_.mode == 7)
+    if (diagnostic_info_.mode == 5 || diagnostic_info_.mode == 7)
     {
       ui_.pushButtonModeDamp->setEnabled(true);
     } 
@@ -621,7 +631,7 @@ namespace mapviz_plugins
       ui_.pushButtonModeDamp->setEnabled(false);
     }
 
-    switch (diag_info_.mode)
+    switch (diagnostic_info_.mode)
     {
     case 0:
       ui_.status_mode->setText("Idle");
@@ -661,9 +671,9 @@ namespace mapviz_plugins
     }
 
     ros::Time now = ros::Time::now();
-    double diagTime = (now - diag_info_.timestamp).toSec();
-    double highStateTime = (now - diag_info_.highStateTs).toSec();
-    double gpsTime = (now - diag_info_.gpsStatusTs).toSec();
+    double diagTime = (now - diagnostic_info_.timestamp).toSec();
+    double highStateTime = (now - diagnostic_info_.highStateTs).toSec();
+    double gpsTime = (now - diagnostic_info_.gpsStatusTs).toSec();
 
     if (diagTime > 10.0)
     {
@@ -711,16 +721,16 @@ namespace mapviz_plugins
       ui_.diag_gps_conn -> setStyleSheet("QLabel { background-color : green; color : white; }");
     }
     
-    ui_.diag_vel -> setText(QString::number(diag_info_.velocity, 'f', 3) + " | " 
-                                + QString::number(diag_info_.commandVelocity, 'f', 3));
-    ui_.diag_yaw -> setText(QString::number(diag_info_.yawSpeed * 180/3.14159, 'f', 1) + " | " 
-                                + QString::number(diag_info_.commandYawSpeed * 180/3.14159, 'f', 1));
-    ui_.diag_battery -> setText(QString::number(diag_info_.batterySoC, 'f', 1));
-    if (diag_info_.batterySoC < 20)
+    ui_.diag_vel -> setText(QString::number(diagnostic_info_.velocity, 'f', 3) + " | " 
+                                + QString::number(diagnostic_info_.commandVelocity, 'f', 3));
+    ui_.diag_yaw -> setText(QString::number(diagnostic_info_.yawSpeed * 180/3.14159, 'f', 1) + " | " 
+                                + QString::number(diagnostic_info_.commandYawSpeed * 180/3.14159, 'f', 1));
+    ui_.diag_battery -> setText(QString::number(diagnostic_info_.batterySoC, 'f', 1));
+    if (diagnostic_info_.batterySoC < 20)
     {
       ui_.diag_battery -> setStyleSheet("QLabel { background-color : red; color : white; }");
     }
-    else if (diag_info_.batterySoC < 50)
+    else if (diagnostic_info_.batterySoC < 50)
     {
       ui_.diag_battery -> setStyleSheet("QLabel { background-color : orange; color : white; }");
     }
@@ -728,12 +738,12 @@ namespace mapviz_plugins
     {
       ui_.diag_battery -> setStyleSheet("QLabel { background-color : green; color : white; }");
     }
-    ui_.diag_gps_quality -> setText(QString::fromStdString(diag_info_.gpsStatusDescription));
-    if (diag_info_.gpsStatusDescription == "No fix")
+    ui_.diag_gps_quality -> setText(QString::fromStdString(diagnostic_info_.gpsStatusDescription));
+    if (diagnostic_info_.gpsStatusDescription == "No fix")
     {
       ui_.diag_gps_quality -> setStyleSheet("QLabel { background-color : red; color : white; }");
     }
-    else if (diag_info_.gpsStatusDescription == "RTK fixed" || diag_info_.gpsStatusDescription == "RTK float" || diag_info_.gpsStatusDescription == "RTK fixed/float") 
+    else if (diagnostic_info_.gpsStatusDescription == "RTK fixed" || diagnostic_info_.gpsStatusDescription == "RTK float" || diagnostic_info_.gpsStatusDescription == "RTK fixed/float") 
     {
       ui_.diag_gps_quality -> setStyleSheet("QLabel { background-color : green; color : white; }");
     }
@@ -973,7 +983,7 @@ namespace mapviz_plugins
     {
       ui_.pushButtonModeDamp->setEnabled(true);
     }
-    else if (diag_info_.mode != 5)
+    else if (diagnostic_info_.mode != 5)
     {
       ui_.pushButtonModeDamp->setEnabled(false);
     }

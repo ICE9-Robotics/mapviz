@@ -70,7 +70,7 @@ namespace mapviz_plugins
     double yawSpeed = 0.0;
     double commandVelocity = 0.0;
     double commandYawSpeed =0.0;
-    int mode = 0;
+    int mode = -1;
     std::string gpsStatusDescription = "No fix";
   };
 
@@ -141,8 +141,9 @@ namespace mapviz_plugins
     float arrow_angle_;
     bool monitoring_action_state_;
     bool is_waypoints_ok_;
+    bool is_settings_tab_initiated_;
     int selected_waypoint_;
-    UgiDiagnosticsInfo diag_info_;
+    UgiDiagnosticsInfo diagnostic_info_;
 
     std::string waypoint_frame_;
     std::vector<tf::Vector3> vertices_;
