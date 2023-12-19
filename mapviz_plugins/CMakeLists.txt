@@ -109,9 +109,6 @@ set(UI_FILES
     ui/textured_marker_config.ui
     ui/tf_frame_config.ui
     ui/topic_select.ui
-    ui/draw_waypoints_config.ui
-    ui/matcher_config.ui
-    ui/ugi_diagnostics_config.ui
     ui/ugi_basestation_config.ui
 )
 
@@ -149,9 +146,6 @@ set(SRC_FILES
     src/string_plugin.cpp
     src/textured_marker_plugin.cpp
     src/tf_frame_plugin.cpp
-    src/draw_waypoints_plugin.cpp
-    src/matcher_plugin.cpp
-    src/ugi_diagnostics_plugin.cpp
     src/ugi_basestation_plugin.cpp
 )
 
@@ -190,9 +184,6 @@ set(HEADER_FILES
     include/${PROJECT_NAME}/string_plugin.h
     include/${PROJECT_NAME}/textured_marker_plugin.h
     include/${PROJECT_NAME}/tf_frame_plugin.h
-    include/${PROJECT_NAME}/draw_waypoints_plugin.h
-    include/${PROJECT_NAME}/matcher_plugin.h
-    include/${PROJECT_NAME}/ugi_diagnostics_plugin.h
     include/${PROJECT_NAME}/ugi_basestation_plugin.h
 )
 

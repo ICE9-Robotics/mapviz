@@ -43,9 +43,6 @@
   <class name="mapviz_plugins/draw_polygon" type="mapviz_plugins::DrawPolygonPlugin" base_class_type="mapviz::MapvizPlugin">
     <description>Plugin for drawing and publishing a polygon.</description>
   </class>
-  <class name="mapviz_plugins/draw_waypoints" type="mapviz_plugins::DrawWaypointsPlugin" base_class_type="mapviz::MapvizPlugin">
-    <description>Plugin for working with follow_waypoints package.</description>
-  </class>
   <class name="mapviz_plugins/path" type="mapviz_plugins::PathPlugin" base_class_type="mapviz::MapvizPlugin">
     <description>Path mapviz plugin.</description>
   </class>
@@ -96,12 +93,6 @@
   </class>
   <class name="mapviz_plugins/object" type="mapviz_plugins::ObjectPlugin" base_class_type="mapviz::MapvizPlugin">
     <description>Display marti_nav_msgs::Obstacles and TrackedObjects</description>
-  </class>
-  <class name="mapviz_plugins/matcher" type="mapviz_plugins::MatcherPlugin" base_class_type="mapviz::MapvizPlugin">
-      <description>UI for matcher node.</description>
-  </class>
-  <class name="mapviz_plugins/ugi_diagnostics" type="mapviz_plugins::UgiDiagnosticsPlugin" base_class_type="mapviz::MapvizPlugin">
-      <description>Displays UGI diagnostics info.</description>
   </class>
   <class name="mapviz_plugins/ugi_basestation" type="mapviz_plugins::UgiBaseStationPlugin" base_class_type="mapviz::MapvizPlugin">
       <description>UGI base station control interface.</description>
