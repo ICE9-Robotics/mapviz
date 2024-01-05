@@ -882,6 +882,8 @@ namespace mapviz_plugins
       if (!is_waypoints_ok_)
       {
         ui_.pushButtonPatrolStart->setChecked(false);
+        QApplication::restoreOverrideCursor();
+        PrintErrorHelper(ui_.status_patrol, "Failed to start. No waypoints.");
         return;
       }
       std_srvs::Trigger trigger;
