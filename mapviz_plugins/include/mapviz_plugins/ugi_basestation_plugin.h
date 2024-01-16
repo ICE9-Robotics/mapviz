@@ -35,6 +35,7 @@
 #include <string>
 #include <vector>
 #include <mapviz/mapviz_plugin.h>
+#include <boost/thread/mutex.hpp>
 
 // QT libraries
 #include <QGLWidget>
@@ -50,6 +51,10 @@
 #include <dynamic_reconfigure/DoubleParameter.h>
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/Config.h>
+#include <dynamic_reconfigure/client.h>
+#include <origin_transform/OriginTransformConfig.h>
+#include <mjpeg_cam/mjpeg_camConfig.h>
+#include <improved_local_planner/DBLocalPlannerReconfigureConfig.h>
 
 // Mapviz libraries
 #include <mapviz/map_canvas.h>
@@ -72,6 +77,63 @@ namespace mapviz_plugins
     double commandYawSpeed =0.0;
     int mode = -1;
     std::string gpsStatusDescription = "No fix";
+    double gpsVelocity = 0.0;
+    double latitude = 0.0;
+    double longitude = 0.0;
+    double heading = 0.0;
+  };
+
+  class UgiBaseStationPluginDynamicParam
+  {
+  public:
+    UgiBaseStationPluginDynamicParam(ros::NodeHandle nh);
+    ~UgiBaseStationPluginDynamicParam();
+
+    void setOriginTransformParam(const origin_transform::OriginTransformConfig &config);
+    bool getOriginTransformParam(origin_transform::OriginTransformConfig &config);
+
+    void setMjpegCamParam(const mjpeg_cam::mjpeg_camConfig &config);
+    bool getMjpegCamParam(mjpeg_cam::mjpeg_camConfig &config);
+
+    void setLocalPlannerParam(const improved_local_planner::DBLocalPlannerReconfigureConfig &config);
+    bool getLocalPlannerParam(improved_local_planner::DBLocalPlannerReconfigureConfig &config);
+
+  protected:
+    bool is_origin_transform_received;
+    bool is_mjpeg_cam_received;
+    bool is_local_planner_received;
+
+  private:
+    ros::NodeHandle nh_;
+
+    // origin_transform
+    dynamic_reconfigure::Client<origin_transform::OriginTransformConfig> origin_transform_param_client_;
+    origin_transform::OriginTransformConfig origin_transform_pending_config_;
+    origin_transform::OriginTransformConfig origin_transform_latest_config_;
+    bool is_origin_transform_update_pending_;
+    boost::mutex origin_transform_param_mutex_;
+    ros::Timer origin_transform_update_timer_;
+
+    // mjpeg_cam
+    dynamic_reconfigure::Client<mjpeg_cam::mjpeg_camConfig> mjpeg_cam_param_client_;
+    mjpeg_cam::mjpeg_camConfig mjpeg_cam_pending_config_;
+    mjpeg_cam::mjpeg_camConfig mjpeg_cam_latest_config_;
+    bool is_mjpeg_cam_update_pending_;
+    boost::mutex mjpeg_cam_param_mutex_;
+    ros::Timer mjpeg_cam_update_timer_;
+
+    // local_planner
+    dynamic_reconfigure::Client<improved_local_planner::DBLocalPlannerReconfigureConfig> local_planner_param_client_;
+    improved_local_planner::DBLocalPlannerReconfigureConfig local_planner_pending_config_;
+    improved_local_planner::DBLocalPlannerReconfigureConfig local_planner_latest_config_;
+    bool is_local_planner_update_pending_;
+    boost::mutex local_planner_param_mutex_;
+    ros::Timer local_planner_update_timer_;
+
+    void getLatestFromSrv();
+    void originTransformTimerCallback(const ros::TimerEvent& ev = ros::TimerEvent());
+    void mjpegCamTimerCallback(const ros::TimerEvent& ev = ros::TimerEvent());
+    void moveBaseTimerCallback(const ros::TimerEvent& ev = ros::TimerEvent());
   };
 
   class UgiBaseStationPlugin : public mapviz::MapvizPlugin
@@ -111,9 +173,7 @@ namespace mapviz_plugins
     void on_pushButtonNavSetGoal_toggled(bool checked);
     void on_pushButtonNavAbort_clicked();
 
-    void on_pushButtonMatcherFlip_clicked();
-    void on_pushButtonMatcherStart_toggled(bool checked);
-    void on_pushButtonMatcherReset_clicked();
+    void on_pushButtonGpsSetDatum_clicked();
 
     void on_pushButtonPatrolDrawWp_toggled(bool checked);
     void on_pushButtonPatrolSendWp_clicked();
@@ -127,21 +187,30 @@ namespace mapviz_plugins
     void on_pushButtonModeRecover_clicked();
     void on_pushButtonModeLock_toggled(bool checked);
 
+    void on_doubleSpinBoxXOffset_valueChanged(double val);
+    void on_doubleSpinBoxYOffset_valueChanged(double val);
+    void on_doubleSpinBoxYawOffset_valueChanged(double val);
+
     void on_doubleSpinBoxFwVel_valueChanged(double val);
     void on_doubleSpinBoxBwVel_valueChanged(double val);
-    void on_doubleSpinBoxYawVel_valueChanged(double val);
+    void on_doubleSpinBoxYawSpd_valueChanged(double val);
     void on_doubleSpinBoxLinearAcc_valueChanged(double val);
     void on_doubleSpinBoxYawAcc_valueChanged(double val);
-    void on_pushButtonSettingRevert_clicked();
+
+    void on_doubleSpinBoxCamBright_valueChanged(double val);
+    void on_doubleSpinBoxCamExp_valueChanged(double val);
+    void on_checkBoxCamAutoExp_toggled(bool checked);
+
     void on_pushButtonSettingRestore_clicked();
-    void on_pushButtonSettingApply_clicked();
 
   private:
-    bool is_mouse_down_;
     float arrow_angle_;
-    bool monitoring_action_state_;
-    bool is_waypoints_ok_;
-    bool is_settings_tab_initiated_;
+    bool is_mouse_down_ = false;
+    bool monitoring_action_state_ = false;
+    bool is_waypoints_ok_ = false;
+    bool is_origin_transform_settings_initiated_ = false;
+    bool is_mjpeg_cam_settings_initiated_ = false;
+    bool is_local_planner_settings_initiated_ = false;
     int selected_waypoint_;
     UgiDiagnosticsInfo diagnostic_info_;
 
@@ -166,10 +235,7 @@ namespace mapviz_plugins
     ros::Publisher polygon_pub_;
     ros::Subscriber waypoints_sub_;
     ros::Subscriber diagnostics_sub_;
-    ros::ServiceClient matcher_start_srv_client_;
-    ros::ServiceClient matcher_stop_srv_client_;
-    ros::ServiceClient matcher_flip_srv_client_;
-    ros::ServiceClient matcher_reset_srv_client_;
+    ros::ServiceClient gps_set_datum_srv_client_;
     ros::ServiceClient path_stop_srv_client_;
     ros::ServiceClient path_ready_srv_client_;
     ros::ServiceClient path_reset_srv_client_;
@@ -178,6 +244,8 @@ namespace mapviz_plugins
     ros::Timer fast_timer_;
 
     MoveBaseClient move_base_client_;
+
+    UgiBaseStationPluginDynamicParam dynamic_param_;
 
 
     void DrawNavGoal(double x, double y, double scale);
@@ -193,6 +261,7 @@ namespace mapviz_plugins
     void fastTimerCallback(const ros::TimerEvent& ev = ros::TimerEvent() );
     void waypointsCallback(const geometry_msgs::PoseArray::ConstPtr& msg);
     void diagnosticsCallback(const unitree_diagnostics_msgs::Diagnostics::ConstPtr& msg);
+    void checkNodeAlive();
   };
 }
 

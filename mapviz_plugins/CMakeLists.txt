@@ -26,9 +26,10 @@ set(DEPENDENCIES
   swri_yaml_util
   tf 
   visualization_msgs
-  rtkgps_odom_matcher
   unitree_diagnostics_msgs
   unitree_legged_msgs
+  mjpeg_cam
+  improved_local_planner
 )
 
 find_package(catkin REQUIRED COMPONENTS ${DEPENDENCIES})
@@ -147,6 +148,7 @@ set(SRC_FILES
     src/textured_marker_plugin.cpp
     src/tf_frame_plugin.cpp
     src/ugi_basestation_plugin.cpp
+    src/ugi_basestation_plugin_dynamic_param.cpp
 )
 
 set(HEADER_FILES
