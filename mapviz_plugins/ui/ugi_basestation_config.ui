@@ -1813,7 +1813,7 @@ background-color:rgb(233, 185, 110);
             </font>
            </property>
            <property name="text">
-            <string>0.0° N</string>
+            <string>0.0 °</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

@@ -75,7 +75,7 @@ void OriginTransform::getUtmTransform(ros::Time time)
     tf2::Transform trans;
     if (!tf_buffer.canTransform(utmFrame, mapFrame, time))
     {
-        ROS_WARN("Cannot get UTM transform");
+        ROS_WARN_THROTTLE(5, "Cannot get UTM transform");
         return;
     }
     tf2::fromMsg(tf_buffer.lookupTransform(utmFrame, mapFrame, time).transform, trans);
