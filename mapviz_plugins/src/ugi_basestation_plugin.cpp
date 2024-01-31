@@ -629,6 +629,7 @@ namespace mapviz_plugins
     else if (!monitoring_action_state_)
     {
       PrintInfoHelper(ui_.status_nav, "Ready to send command");
+      PrintInfoHelper(ui_.status_settings, "Ready");
     }
     else
     {
